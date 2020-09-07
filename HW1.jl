@@ -1,6 +1,7 @@
 using Roots
 using LinearAlgebra
 using Plots
+using DifferentialEquations
 
 μₑ = 398600 # [km^3/s^2]
 μₘ = 4902
@@ -38,14 +39,12 @@ print(L₁, L₂, L₃)
 # Calculate effective potential energy and plot contours
 r₁ = [-R₁; 0; 0]
 r₂ = [ R₂; 0; 0]
-PE(r₁, r₂, r₃) = -μ₁/norm(r₃-r₁) -μ₂/norm(r₃-r₂);# - .5*(ωₛ^2)*(r₃[1]^2 + r₃[2]^2)
+PE(r₃) = -μ₁/norm(r₃-r₁) -μ₂/norm(r₃-r₂) - .5*(ωₛ^2)*(r₃[1]^2 + r₃[2]^2)
 
-r_grid = range(.25*R, stop = 2*R, length = 100)
-θ_grid = range(0, stop = 2*pi, length = 100)
-x_grid = [r*sin(θ) for r in r_grid, θ in θ_grid]
-y_grid = [r*cos(θ) for r in r_grid, θ in θ_grid]
+num_points = 1000
+points = [range(-1.25*R, stop = -.01*R, length = num_points); range(.01*R, stop = 1.25*R, length = num_points)]
 
-PE_eff = [PE(r₁, r₂, [x; y; 0]) for x in x_grid, y in y_grid]
+PE_eff = [PE([point_x; point_y; 0]) for point_x in points, point_y in points]
+p1 = contour(points, points, PE_eff, fill=true, levels=-1.67:.01:-1.57, xlabel='X', ylabel='Y')
 
-p1 = contour(x_grid, y_grid, PE_eff)
-plot(p1)
+# Free return trajec
